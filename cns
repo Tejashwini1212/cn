@@ -73,6 +73,9 @@ Enter shift value:
 Original text is COMPUTER SCIENCE
 Encrypted Text is FRPSXWHU VFLHQFH
 Decrypted Text is COMPUTER SCIENCE
+
+
+
 b) PLAYFAIR CIPHER:
 import java.awt.Point;
 import java.util.Scanner;
@@ -416,6 +419,7 @@ ZZABCDEFGHIJKLMNOPQRSTUVWXY
 4. Exit
 Enter your option: 4
 
+
 b) RAILFENCE CIPHER:
 #include<stdio.h>
 #include<string.h>
@@ -750,6 +754,44 @@ public class RSA {
  return gcd(z.mod(e), e); 
  } 
 } 
+#2RSA
+import java.math.BigInteger;
+import java.util.Scanner;
+
+public class RSA {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        BigInteger msg, p, q, n, z, d = BigInteger.TWO, e = BigInteger.ZERO;
+
+        System.out.println("Enter message, first prime (p), and second prime (q):");
+        msg = sc.nextBigInteger();
+        p = sc.nextBigInteger();
+        q = sc.nextBigInteger();
+
+        n = p.multiply(q);
+        z = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
+
+        while (!gcd(d, z).equals(BigInteger.ONE)) d = d.add(BigInteger.ONE);
+
+        for (int i = 0; i <= 9; i++) {
+            BigInteger x = BigInteger.ONE.add(BigInteger.valueOf(i).multiply(z));
+            if (x.mod(d).equals(BigInteger.ZERO)) {
+                e = x.divide(d);
+                break;
+            }
+        }
+
+        BigInteger c = msg.modPow(e, n);
+        System.out.println("Encrypted: " + c);
+        System.out.println("Decrypted: " + c.modPow(d, n));
+        sc.close();
+    }
+
+    static BigInteger gcd(BigInteger a, BigInteger b) {
+        return b.equals(BigInteger.ZERO) ? a : gcd(b, a.mod(b));
+    }
+}
+
 
 
 8. Implement DiƯie-Hellman key exchange mechanism using HTML and Java script. 
