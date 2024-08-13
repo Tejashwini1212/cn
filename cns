@@ -897,3 +897,161 @@ public class MDS {
  } 
  } 
 } 
+
+
+
+
+!AES
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+import java.util.Scanner;
+
+public class AES {
+
+    private SecretKeySpec secretKeySpec;
+
+    public AES(String secretKey) {
+        this.secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "AES");
+    }
+
+    public String encrypt(String text) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            byte[] encryptedBytes = cipher.doFinal(text.getBytes());
+            return Base64.getEncoder().encodeToString(encryptedBytes);
+        } catch (Exception e) {
+            System.err.println("Encryption Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public String decrypt(String encryptedText) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedText));
+            return new String(decryptedBytes);
+        } catch (Exception e) {
+            System.err.println("Decryption Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter a secret key (16, 24, or 32 characters): ");
+        String secretKey = scanner.nextLine();
+
+        System.out.print("Enter the text to encrypt: ");
+        String textToEncrypt = scanner.nextLine();
+
+        AES aes = new AES(secretKey);
+
+        String encryptedText = aes.encrypt(textToEncrypt);
+        if (encryptedText != null) {
+            System.out.println("\nEncrypted Text: " + encryptedText);
+
+            String decryptedText = aes.decrypt(encryptedText);
+            if (decryptedText != null) {
+                System.out.println("Decrypted Text: " + decryptedText);
+            }
+        }
+
+        scanner.close();
+    }
+}
+
+
+!hill
+#include <stdio.h>
+#include <string.h>
+
+void encrypt(int a[3][3], unsigned int *c, unsigned int *d, int len) {
+    int t, i, j, k = 0;
+    for (k = 0; k < len; k += 3) {
+        for (i = 0; i < 3; i++) {
+            t = 0;
+            for (j = 0; j < 3; j++) {
+                t += a[i][j] * c[k + j];
+            }
+            d[k + i] = t % 26;
+        }
+    }
+}
+
+void decrypt(int b[3][3], unsigned int *d, unsigned int *c, int len) {
+    int t, i, j, k = 0;
+    for (k = 0; k < len; k += 3) {
+        for (i = 0; i < 3; i++) {
+            t = 0;
+            for (j = 0; j < 3; j++) {
+                t += b[i][j] * d[k + j];
+            }
+            c[k + i] = t % 26;
+        }
+    }
+}
+
+int main() {
+    int a[3][3], b[3][3];
+    unsigned int c[100], d[100];
+    char msg[100];
+    int original_len, padded_len, i, j;
+
+    // Input the encryption matrix
+    printf("Enter the 3x3 encryption matrix (a):\n");
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            printf("a[%d][%d]: ", i, j);
+            scanf("%d", &a[i][j]);
+        }
+    }
+
+    // Input the decryption matrix
+    printf("Enter the 3x3 decryption matrix (b):\n");
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 3; j++) {
+            printf("b[%d][%d]: ", i, j);
+            scanf("%d", &b[i][j]);
+        }
+    }
+
+    // Input the plaintext
+    printf("Enter the plaintext: ");
+    scanf("%s", msg);
+    original_len = strlen(msg);
+    padded_len = original_len;
+
+    // Pad the plaintext if necessary to make its length a multiple of 3
+    while (padded_len % 3 != 0) {
+        msg[padded_len] = 'X';
+        padded_len++;
+    }
+    msg[padded_len] = '\0';
+
+    // Convert the plaintext to numerical values (A=0, B=1, ..., Z=25)
+    for (i = 0; i < padded_len; i++)
+        c[i] = msg[i] - 65;
+
+    // Encrypt the plaintext
+    encrypt(a, c, d, padded_len);
+    printf("\nEncrypted cipher text: ");
+    for (i = 0; i < padded_len; i++)
+        printf("%c", d[i] + 65);
+
+    // Decrypt the ciphertext
+    decrypt(b, d, c, padded_len);
+    printf("\nDecrypted cipher text: ");
+    for (i = 0; i < original_len; i++)
+        printf("%c", c[i] + 65);
+
+    printf("\n");
+    return 0;
+}
+
+
+
+
